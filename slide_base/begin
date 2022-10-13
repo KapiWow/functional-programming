@@ -1,0 +1,42 @@
+\documentclass[10pt]{beamer}
+\input{preamble}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+
+\usepackage{polyglossia}
+% \setdefaultlanguage{english}
+\usetheme[numbers]{SaintPetersburg}
+
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{minted}
+
+\title{Функциональное программирование}
+\subtitle{part 3}
+% \institute{Division}
+\author{Гавриков Антон Александрович}
+\date{2022}
+
+\usepackage{listings}
+
+\lstset{numbers=left,numberstyle=\tiny,numbersep=5pt,language=Lisp,
+  stringstyle=\ttfamily\small,basicstyle=\ttfamily\footnotesize,
+  showstringspaces=false,breaklines}
+
+% \titlegraphic{\includesvg[height=1.5cm]{Images/Archlinux.svg}}
+
+\usecolortheme[named=teal]{structure}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}[fragile]
