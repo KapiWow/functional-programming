@@ -46,5 +46,6 @@
 ;(define (stream-unite s1 s2) ???)
 ;элементы в конечном потоке должны чередоваться
 
-(stream-print-first (stream-unite ones zeros) 10)
+;раскомментируйте тесты
+;(stream-print-first (stream-unite ones zeros) 10)
 ; 1 : 0 : 1 : 0 : 1 : 0 : 1 : 0 : 1 : 0 :
