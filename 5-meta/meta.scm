@@ -111,8 +111,8 @@
           (eval-sequence (rest-exps exps) env))))
 
 (next-slide "Определение")
-;(define var value)
-;(define (var param_1 param_2 ... param_n) body)
+;(define var value)                                     1 def
+;(define (var param_1 param_2 ... param_n) body)        2 def
 ;(define var (lambda  (param_1 param_2 ... param_n) body))
 
 (define (definition? exp) (tagged-list? exp 'define))
@@ -142,7 +142,7 @@
                        (eval (assignment-value exp) env)
                        env)
   'ok)
-
+;(set! var val)
 (define (assignment? exp) (tagged-list? exp 'set!))
 (define (assignment-variable exp) (cadr exp))
 (define (assignment-value exp) (caddr exp))
@@ -159,6 +159,8 @@
 
 (define true #t)
 (define false #f)
+(define (true? x) (not (eq? x false)))
+(define (false? x) (eq? x false))
 (define (self-evaluating? exp)
   (cond ((number? exp) true)
         ((string? exp) true)
@@ -181,6 +183,7 @@
 
 (next-slide "begin")
 
+;(begin exp1 exp2 exp3 ... expn)
 (define (make-begin seq) (cons 'begin seq))
 
 (define (begin? exp) (tagged-list? exp 'begin))
@@ -196,7 +199,10 @@
 
 
 (next-slide "cond")
-
+;(cond  (pred1 action1) 
+;       (pred2 action2)
+;       ...
+;       (else action-else))
 (define (cond? exp) (tagged-list? exp 'cond))
 (define (cond-clauses exp) (cdr exp))
 (define (cond-else-clause? clause)
@@ -219,12 +225,11 @@
                  (expand-clauses rest))))))
 
 
-(define (true? x) (not (eq? x false)))
-(define (false? x) (eq? x false))
 
-
+(next-slide "Процедуры")
 ;(apply-primitive-procedure proc args)
 ;(primitive-procedure? proc)
+;Примитивные будут дальше
 (define (make-procedure parameters body env)
   (list 'procedure parameters body env))
 (define (compound-procedure? p)
@@ -234,12 +239,13 @@
 (define (procedure-environment p) (cadddr p))
 
 
+(next-slide "Окружение")
+;Окружение хранит и изменяет переменные
+;Окружение это список фреймов
 (define (enclosing-environment env) (cdr env))
 (define (first-frame env) (car env))
 (define the-empty-environment '())
-
-
-
+;Один фрейм это пара листов (лист переменных и лист значений)
 (define (make-frame variables values)
   (cons variables values))
 (define (frame-variables frame) (car frame))
@@ -247,8 +253,7 @@
 (define (add-binding-to-frame! var val frame)
   (set-car! frame (cons var (car frame)))
   (set-cdr! frame (cons val (cdr frame))))
-
-
+;добавить фрейм в окружение
 (define (extend-environment vars vals base-env)
   (if (= (length vars) (length vals))
     (cons (make-frame vars vals) base-env)
@@ -256,6 +261,8 @@
       (error "Too many arguments supplied" vars vals)
       (error "Too few arguments supplied" vars vals))))
 
+
+(next-slide "Найти переменную в окружении")
 
 (define (lookup-variable-value var env)
   (define (env-loop env)
@@ -271,6 +278,7 @@
               (frame-values frame)))))
   (env-loop env))
 
+(next-slide "Поменять переменную в окружении")
 
 (define (set-variable-value! var val env)
   (define (env-loop env)
@@ -286,7 +294,7 @@
               (frame-values frame)))))
   (env-loop env))
 
-
+(next-slide "Добавить переменную в окружении")
 
 (define (define-variable! var val env)
   (let ((frame (first-frame env)))
@@ -296,6 +304,8 @@
             ((eq? var (car vars)) (set-car! vals val))
             (else (scan (cdr vars) (cdr vals)))))
     (scan (frame-variables frame) (frame-values frame))))
+
+(next-slide "Примитивные процедуры")
 
 (define primitive-procedures
   (list (list 'car car)
@@ -309,6 +319,15 @@
   (map (lambda (proc) (list 'primitive (cadr proc)))
        primitive-procedures))
 
+(define (primitive-procedure? proc)
+  (tagged-list? proc 'primitive))
+(define (primitive-implementation proc) (cadr proc))
+
+(define (apply-primitive-procedure proc args)
+  (apply-in-underlying-scheme
+    (primitive-implementation proc) args))
+
+(next-slide "Создание окружения")
 
 (define (setup-environment)
   (let ((initial-env
@@ -318,19 +337,8 @@
     (define-variable! 'true true initial-env)
     (define-variable! 'false false initial-env)
     initial-env))
-(define the-global-environment (setup-environment))
 
-
-(define (primitive-procedure? proc)
-  (tagged-list? proc 'primitive))
-(define (primitive-implementation proc) (cadr proc))
-
-
-
-(define (apply-primitive-procedure proc args)
-  (apply-in-underlying-scheme
-    (primitive-implementation proc) args))
-
+(next-slide "Запуск")
 
 (define input-prompt ";;; M-Eval input:")
 (define output-prompt ";;; M-Eval value:")
@@ -359,44 +367,13 @@
 
 
 (define the-global-environment (setup-environment))
-(define user-initial-environment (setup-environment))
 
-;(driver-loop)
+(driver-loop)
 
-;(define (f x)
-;  (define (even? n) (if (= n 0) true (odd? (- n 1))))
-;  (define (odd? n) (if (= n 0) false (even? (- n 1))))
-;  (rest of body of f))
-;
-;(lambda vars
-;  (define u e1)
-;  (define v e2)
-;  e3)
-;
-;(lambda ⟨vars⟩
-;  (let ((u '*unassigned*)
-;        (v '*unassigned*))
-;    (set! u e1)
-;    (set! v e2)
-;    e3))
+(define (my-append x y)
+  (if (null? x)
+    y
+    (cons (car x) (my-append (cdr x) y))))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(my-append '(a b c) '(d e f))
