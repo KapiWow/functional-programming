@@ -281,6 +281,8 @@
         (list 'list list)
         (list 'not not)
         (list 'odd? odd?)
+        (list 'member member)
+        (list 'abs abs)
         (list '= =)
         (list '+ +)
         (list '* *)
